@@ -1,9 +1,14 @@
 (function () {
     const gridSize = 8;
     const zoneColors = {
-        0: [158, 200, 255], 1: [204, 255, 184], 2: [232, 232, 238],
-        3: [255, 247, 157], 4: [255, 216, 168], 5: [255, 182, 183],
-        6: [149, 244, 242], 7: [213, 187, 255]
+        0: [158, 200, 255], 
+        1: [204, 255, 184], 
+        2: [232, 232, 238],
+        3: [255, 247, 157], 
+        4: [255, 216, 168], 
+        5: [255, 182, 183],
+        6: [149, 244, 242], 
+        7: [213, 187, 255]
     };
 
     let zoneMap = [];
@@ -43,19 +48,28 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            const imageData = ctx.getImageData(0, 0, img.width, img.height);
+            // 指定4点
+            const x0 = 59, y0 = 557, x1 = 899, y1 = 1397;
+            const cropW = x1 - x0;
+            const cropH = y1 - y0;
+            canvas.width = cropW;
+            canvas.height = cropH;
+            ctx.clearRect(0, 0, cropW, cropH);
+            ctx.drawImage(img, x0, y0, cropW, cropH, 0, 0, cropW, cropH);
+            const imageData = ctx.getImageData(0, 0, cropW, cropH);
             const data = imageData.data;
-            const cellW = Math.floor(img.width / gridSize);
-            const cellH = Math.floor(img.height / gridSize);
+            const cellW = Math.floor(cropW / gridSize); // 105
+            const cellH = Math.floor(cropH / gridSize); // 105
             zoneMap = [];
             for (let row = 0; row < gridSize; row++) {
                 const rowZones = [];
                 for (let col = 0; col < gridSize; col++) {
-                    const avg = getAverageColor(data, col * cellW, row * cellH, cellW, cellH, img.width);
-                    rowZones.push(closestZoneColor(avg));
+                    // セル中央の座標
+                    const cx = Math.floor((col + 0.5) * cellW);
+                    const cy = Math.floor((row + 0.5) * cellH);
+                    const i = (cy * cropW + cx) * 4;
+                    const rgb = [data[i], data[i + 1], data[i + 2]];
+                    rowZones.push(closestZoneColor(rgb));
                 }
                 zoneMap.push(rowZones);
             }
