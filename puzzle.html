@@ -11,6 +11,11 @@
 
 <body>
     <h2>画像を読み込んでゾーンパズルを解く</h2>
+    <label for="gridSizeSelector">グリッドサイズ：</label>
+    <select id="gridSizeSelector">
+        <option value="7">7×7</option>
+        <option value="8" selected>8×8</option>
+    </select>
     <label for="imageInput">画像を選択：</label>
     <input type="file" id="imageInput"><br>
     <canvas id="canvas"></canvas>

@@ -1,5 +1,6 @@
 (function () {
-    const gridSize = 8;
+    let gridSize = 8;
+
     const zoneColors = {
         0: [158, 200, 255], 
         1: [204, 255, 184], 
@@ -47,6 +48,16 @@
         return [r / count, g / count, b / count];
     }
 
+    // gridSizeSelectorの選択値を反映
+    const gridSizeSelector = document.getElementById('gridSizeSelector');
+    gridSize = Number(gridSizeSelector.value);
+    gridSizeSelector.addEventListener('change', (e) => {
+        gridSize = Number(e.target.value);
+        // zoneMapリセット&グリッド再描画
+        zoneMap = Array.from({ length: gridSize }, () => Array(gridSize).fill(0));
+        renderGrid(Array.from({ length: gridSize }, () => Array(gridSize).fill('.')));
+    });
+
     document.getElementById('imageInput').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -64,8 +75,8 @@
             ctx.drawImage(img, x0, y0, cropW, cropH, 0, 0, cropW, cropH);
             const imageData = ctx.getImageData(0, 0, cropW, cropH);
             const data = imageData.data;
-            const cellW = Math.floor(cropW / gridSize); // 105
-            const cellH = Math.floor(cropH / gridSize); // 105
+            const cellW = Math.floor(cropW / gridSize);
+            const cellH = Math.floor(cropH / gridSize);
             zoneMap = [];
             for (let row = 0; row < gridSize; row++) {
                 const rowZones = [];
@@ -89,6 +100,7 @@
     function renderGrid(board) {
         const grid = document.getElementById('grid');
         grid.innerHTML = '';
+        grid.style.gridTemplateColumns = `repeat(${gridSize}, 30px)`;
         for (let i = 0; i < gridSize; i++) {
             for (let j = 0; j < gridSize; j++) {
                 const cell = document.createElement('div');
