@@ -14,10 +14,16 @@
     let zoneMap = [];
 
     function closestZoneColor(rgb) {
+        // 輝度重み付きユークリッド距離で判定
+        const weights = [0.3, 0.59, 0.11]; // R,G,Bの重み
         let minDist = Infinity;
         let closest = -1;
         for (const [zone, color] of Object.entries(zoneColors)) {
-            const dist = Math.hypot(rgb[0] - color[0], rgb[1] - color[1], rgb[2] - color[2]);
+            const dist = Math.sqrt(
+                weights[0] * Math.pow(rgb[0] - color[0], 2) +
+                weights[1] * Math.pow(rgb[1] - color[1], 2) +
+                weights[2] * Math.pow(rgb[2] - color[2], 2)
+            );
             if (dist < minDist) {
                 minDist = dist;
                 closest = Number(zone);
@@ -89,6 +95,11 @@
                 cell.className = 'cell';
                 cell.style.backgroundColor = `rgb(${zoneColors[zoneMap[i]?.[j] || 0].join(',')})`;
                 cell.textContent = board[i][j] === '*' ? '★' : '';
+                // セル編集用クリックイベント
+                cell.addEventListener('click', (e) => {
+                    zoneMap[i][j] = (zoneMap[i][j] + 1) % Object.keys(zoneColors).length;
+                    renderGrid(board);
+                });
                 grid.appendChild(cell);
             }
         }
